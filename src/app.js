@@ -1,23 +1,33 @@
 const express = require('express');
+const connectDB = require('./config/database');
 const app = express();
+const User = require('./models/user');
 
-app.get("/getUserData", (req,res)=> {
-    try{
-        //Logic to connect DB and getUserData
-        throw new Error("DB connection failed");
-        res.status(200).send("User data");
+app.post("/signup", async (req,res)=> {
+    const user = new User({
+        firstName: "Virat",
+        lastName: "Kohli",
+        emailId: "virat@gmail.com",
+        password: "virat123",
+    });
+    try {
+    await user.save();
+    res.send("User signed up");
     }
-    catch(err) {
-        res.status(500).send("Error found");
+    catch( err)  {
+        console.log("Error in saving user");
+        res.status(500).send("Internal server error");
     }
 })
 
-//Always keep last of the application ("/")
-app.use((err, req,res, next) => {
-    if(err){
-        res.status(500).send("Some error occurred");
-    }
-});
-app.listen(7777, ()=> {
+connectDB()
+   .then(()=> {
+    console.log("DB connected");
+    app.listen(7777, ()=> {
     console.log("listening on port 7777");
 });
+   })
+   .catch(err => {
+    console.log("DB connection can't be done");
+   })
+
