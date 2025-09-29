@@ -61,6 +61,49 @@ app.get("/user", async(req,res) => {
         res.status(500).send("Internal server error");
     }
 })
+//findbyID
+app.post("/user", async(req,res) => {
+     const id = req.body._id;
+    try{
+        const user = await User.findById(id);
+        if(!user){
+            res.status(404).send("userId not found");
+        }
+        res.send(user);
+    }
+    catch(err){
+        res.status(500).send("Internal server error");
+    }
+})
+//findByIdAndDelete
+app.delete("/user", async(req,res)=> {
+    const id =req.body._id;
+    try{
+        const userId = await User.findByIdAndDelete({_id: id});
+        if(!userId){
+            res.status(404).send("userId not found");
+        }
+        res.send("User deleted successfully");
+    }
+    catch(err){
+        res.status(500).send("Internal server error");
+    }
+})
+//Update data of the user
+app.patch("/user", async (req,res) => {
+    const id = req.body._id;
+    const data = req.body;
+    try{
+        await User.findByIdAndUpdate({_id : id}, data, {runValidators: true});
+        if(!data){
+            res.status(404).send("userId not found");
+        }
+        res.send("User data updated successfully");
+    }
+    catch(err){
+        res.status(500).send("upadte status: "+ err.message);
+    }
+})
 
 connectDB()
    .then(()=> {
