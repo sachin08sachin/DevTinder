@@ -1,27 +1,59 @@
 const express = require('express');
 const connectDB = require('./config/database');
 const app = express();
-const User = require('./models/user');
-
 app.use(express.json());
+const User = require('./models/user');
+const bcrypt = require('bcrypt');
+const {validateSignUpData, validateLoginData} = require('./utils/validation')
 
 app.post("/signup", async (req,res)=> {
-    // console.log(req.body);
-    const user = new User(req.body);
-    // const user = new User({
-    //     firstName: "Virat",
-    //     lastName: "Kohli",
-    //     emailId: "virat@gmail.com",
-    //     password: "virat123",
-    // });
     try {
+        //validation of data(req.body)
+        validateSignUpData(req);
+
+        const {firstName, lastName, emailId, password} = req.body;
+
+        //Encrypting the password using bcrypt
+        const passwordHash = await bcrypt.hash(password,10);
+        console.log(passwordHash);
+
+        //creating new instance of the User
+         const user = new User({
+        firstName,
+        lastName,
+        emailId,
+        password: passwordHash,
+    });
+
     await user.save();
     res.send("User signed up");
     }
     catch( err)  {
         console.log("Error in saving user");
-        res.status(500).send("Internal server error");
+        res.status(400).send("ERROR : "+ err.message);
     }
+})
+//login API
+app.post("/login", async(req,res)=> {
+    try{
+        validateLoginData(req);
+      const {emailId, password}= req.body;
+       const user = await User.findOne({emailId: emailId});
+       if(!user){
+        throw new Error("Invalid Credentials");
+       }
+       const isPasswordMatch = await bcrypt.compare(password, user.password);
+       if(!isPasswordMatch){
+        throw new Error("Invalid Credentials")
+       }
+       else{
+        res.send("User logged in successfully");
+       }
+    }
+    catch(err){
+        res.status(400).send("Error in login: " + err.message);
+    }
+    
 })
 //GET user by emailId 
 app.get("/user", async (req,res) => {
