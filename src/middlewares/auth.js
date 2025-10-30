@@ -4,8 +4,8 @@ const User = require('../models/user');
 const userAuth = async (req, res, next) => {
  try{
     const {token} = req.cookies;
-    console.log("Cookies in auth middleware: ", req.cookies);
-    console.log("Token from cookies: ", token);
+    // console.log("Cookies in auth middleware: ", req.cookies);
+    // console.log("Token from cookies: ", token);
     if(!token){
         return res.status(400).send("Token is not valid!!!!!!!!")
     }
