@@ -1,19 +1,21 @@
 ##DEVTINDER APIs
 
 #authRouter
+
 - POST /signup
 - POST /login
 - POST /logout
 
 #profileRouter
+
 - GET /profile
 - PATCH /profile/edit
--PATCH /profile/password
+  -PATCH /profile/password
 
 #connectionRequestRouter
 -POST /request/send/:status/:userId
-- POST /request/review/:status/:reviewId
 
+- POST /request/review/:status/:reviewId
 
 #userRouter
 -GET /user/requests/received
